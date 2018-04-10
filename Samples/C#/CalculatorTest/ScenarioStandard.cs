@@ -1,4 +1,4 @@
-﻿//******************************************************************************
+//******************************************************************************
 //
 // Copyright (c) 2017 Microsoft Corporation. All rights reserved.
 //
@@ -18,6 +18,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium.Appium.Windows;
 using System.Threading;
 using System;
+using System.IO;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Remote;
 
 namespace CalculatorTest
 {
@@ -26,6 +29,36 @@ namespace CalculatorTest
     {
         private static WindowsElement header;
         private static WindowsElement calculatorResult;
+        private const string Input = @"G:\My Drive\SanJose_Team\PNTDATA\BORROWER";
+        private const string Output = @"C:\Users\Agent\Downloads\fnm\";
+
+        [TestMethod]
+        public void ExportFromPoint()
+        {
+            Console.WriteLine("Exporting files...");
+
+            string[] fileEntries = Directory.GetFiles(Input, "*brw");
+            foreach (string file in fileEntries)
+            {
+                Console.WriteLine(file);
+                string fnmFile = Output + Path.GetFileName(file) + ".fnm";
+                if (!File.Exists(fnmFile))
+                {
+                session.FindElementByName("File").Click();
+                session.FindElementByName("Open File...").Click();
+                Thread.Sleep(TimeSpan.FromSeconds(2));
+                //session.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(5));
+                session.Keyboard.SendKeys(file + Keys.Enter);
+                Thread.Sleep(TimeSpan.FromSeconds(2));
+                session.FindElementByName("File").Click();
+                session.FindElementByName("Export To").Click();
+                session.FindElementByName("Fannie Mae 3.2 DO/DU (Local)...").Click();
+                session.Keyboard.SendKeys(fnmFile + Keys.Enter);
+                Thread.Sleep(TimeSpan.FromSeconds(1));
+                session.Keyboard.SendKeys(Keys.Enter);
+                }
+            }
+        }
 
         [TestMethod]
         public void Addition()
@@ -92,44 +125,12 @@ namespace CalculatorTest
         {
             // Create session to launch a Calculator window
             Setup(context);
-
-            // Identify calculator mode by locating the header
-            try
-            {
-                header = session.FindElementByAccessibilityId("Header");
-            }
-            catch
-            {
-                header = session.FindElementByAccessibilityId("ContentPresenter");
-            }            
-
-            // Ensure that calculator is in standard mode
-            if (!header.Text.Equals("Standard", StringComparison.OrdinalIgnoreCase))
-            {
-                session.FindElementByAccessibilityId("NavButton").Click();
-                Thread.Sleep(TimeSpan.FromSeconds(1));
-                var splitViewPane = session.FindElementByClassName("SplitViewPane");
-                splitViewPane.FindElementByName("Standard Calculator").Click();
-                Thread.Sleep(TimeSpan.FromSeconds(1));
-                Assert.IsTrue(header.Text.Equals("Standard", StringComparison.OrdinalIgnoreCase));
-            }
-
-            // Locate the calculatorResult element
-            calculatorResult = session.FindElementByAccessibilityId("CalculatorResults");
-            Assert.IsNotNull(calculatorResult);
         }
 
         [ClassCleanup]
         public static void ClassCleanup()
         {
             TearDown();
-        }
-
-        [TestInitialize]
-        public void Clear()
-        {
-            session.FindElementByName("Clear").Click();
-            Assert.AreEqual("0", GetCalculatorResultText());
         }
 
         private string GetCalculatorResultText()
