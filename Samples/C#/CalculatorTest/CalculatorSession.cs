@@ -1,4 +1,4 @@
-﻿//******************************************************************************
+//******************************************************************************
 //
 // Copyright (c) 2017 Microsoft Corporation. All rights reserved.
 //
@@ -25,25 +25,38 @@ namespace CalculatorTest
     {
         // Note: append /wd/hub to the URL if you're directing the test at Appium
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
-        private const string CalculatorAppId = "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App";
+        private const string CalculatorAppId = @"C:\WINPOINT\Winpoint.exe";//"Microsoft.WindowsCalculator_8wekyb3d8bbwe!App";
 
         protected static WindowsDriver<WindowsElement> session;
+        private static WindowsDriver<WindowsElement> DesktopSession;
 
         public static void Setup(TestContext context)
         {
             // Launch Calculator application if it is not yet launched
             if (session == null)
             {
+                DesiredCapabilities appCapabilities;
+                //appCapabilities = new DesiredCapabilities();
+                //appCapabilities.SetCapability("app", CalculatorAppId);
+                //appCapabilities.SetCapability("deviceName", "WindowsPC");
+                //session = new WindowsDriver<WindowsElement>(new Uri(WindowsApplicationDriverUrl), appCapabilities);
+                // Set implicit timeout to 1.5 seconds to make element search to retry every 500 ms for at most three times
+                //session.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(3));
+
+                appCapabilities = new DesiredCapabilities();
+                appCapabilities.SetCapability("app", "Root");
+                DesktopSession = new WindowsDriver<WindowsElement>(new Uri(WindowsApplicationDriverUrl), appCapabilities);
+
+                var CortanaWindow = DesktopSession.FindElementByName("Point");
+                var CortanaTopLevelWindowHandle = CortanaWindow.GetAttribute("NativeWindowHandle");
+                CortanaTopLevelWindowHandle = (int.Parse(CortanaTopLevelWindowHandle)).ToString("x");
+
                 // Create a new session to bring up an instance of the Calculator application
                 // Note: Multiple calculator windows (instances) share the same process Id
-                DesiredCapabilities appCapabilities = new DesiredCapabilities();
-                appCapabilities.SetCapability("app", CalculatorAppId);
-                appCapabilities.SetCapability("deviceName", "WindowsPC");
+                appCapabilities = new DesiredCapabilities();
+                appCapabilities.SetCapability("appTopLevelWindow", CortanaTopLevelWindowHandle);
                 session = new WindowsDriver<WindowsElement>(new Uri(WindowsApplicationDriverUrl), appCapabilities);
                 Assert.IsNotNull(session);
-
-                // Set implicit timeout to 1.5 seconds to make element search to retry every 500 ms for at most three times
-                session.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(1.5));
             }
         }
 
