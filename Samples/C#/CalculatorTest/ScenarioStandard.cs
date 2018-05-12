@@ -29,15 +29,38 @@ namespace CalculatorTest
     {
         private static WindowsElement header;
         private static WindowsElement calculatorResult;
-        private const string Input = @"G:\My Drive\SanJose_Team\PNTDATA\BORROWER";
-        private const string Output = @"C:\Users\Agent\Downloads\fnm\";
+        private const string Input = @"C:\Users\Agent\Documents\input\";
+        private const string Output = @"C:\Users\Agent\Documents\output\";
 
         [TestMethod]
-        public void ExportFromPoint()
+        public void CleanUp()
+        {
+            Console.WriteLine("Cleaning up files...");
+            System.IO.DirectoryInfo di = new DirectoryInfo(Output);
+
+            foreach (FileInfo file in di.GetFiles())
+            {
+                file.Delete();
+            }
+        }
+
+        [TestMethod]
+        public void exportBRW()
+        {
+            ExportFromPoint("brw");
+        }
+
+        [TestMethod]
+        public void exportPRS()
+        {
+            ExportFromPoint("prs");
+        }
+
+        public void ExportFromPoint(String ext)
         {
             Console.WriteLine("Exporting files...");
 
-            string[] fileEntries = Directory.GetFiles(Input, "*brw");
+            string[] fileEntries = Directory.GetFiles(Input, "*" + ext);
             foreach (string file in fileEntries)
             {
                 Console.WriteLine(file);
