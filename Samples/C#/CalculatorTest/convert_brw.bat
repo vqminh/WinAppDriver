@@ -1,0 +1,1 @@
+VSTest.Console bin\Debug\CalculatorTest.dll /Tests:exportBRW
