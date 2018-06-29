@@ -1,2 +1,2 @@
-del C:\Users\Agent\Documents\input\*
-del C:\Users\Agent\Documents\output\*
+del /F /Q C:\Users\ADMIN\Documents\input\*
+del /F /Q C:\Users\ADMIN\Documents\output\*

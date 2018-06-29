@@ -1,2 +1,2 @@
-cleanup.bat
-gsutil cp gs://lender-rate.appspot.com/6241133145358336/BRW/* C:\Users\Agent\Documents\input\
+call cleanup.bat
+gsutil cp gs://lender-rate.appspot.com/$1/BRW/* C:\Users\ADMIN\Documents\input\
